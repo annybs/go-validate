@@ -10,7 +10,7 @@ var (
 func MaxSize[T any](l int) func([]T) error {
 	return func(value []T) error {
 		if len(value) > l {
-			return ErrMustHaveFewerItems
+			return ErrMustHaveFewerItems.With(l)
 		}
 		return nil
 	}
@@ -20,7 +20,7 @@ func MaxSize[T any](l int) func([]T) error {
 func MinSize[T any](l int) func([]T) error {
 	return func(value []T) error {
 		if len(value) < l {
-			return ErrMustHaveMoreItems
+			return ErrMustHaveMoreItems.With(l)
 		}
 		return nil
 	}

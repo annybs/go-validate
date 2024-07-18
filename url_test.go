@@ -2,30 +2,33 @@ package validate
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
 
+func ExampleURL() {
+	fmt.Println(URL("not a url"))
+	// Output: invalid URL
+}
+
 func TestURL(t *testing.T) {
-	type TestCase struct {
-		Input string
-		Err   error
+	testCases := map[string]error{
+		"http://example.com":                    nil,
+		"http://subdomain.example.com":          nil,
+		"http://www.example.com/some-page.html": nil,
+
+		"not a url":     ErrInvalidURL,
+		"subdomain.com": ErrInvalidURL,
 	}
 
-	testCases := []TestCase{
-		{Input: "http://example.com"},
-		{Input: "http://subdomain.example.com"},
-		{Input: "http://www.example.com/some-page.html"},
-		{Input: "subdomain.com", Err: ErrInvalidURL},
-		{Input: "not a url", Err: ErrInvalidURL},
-	}
+	for input, want := range testCases {
+		t.Run(input, func(t *testing.T) {
+			got := URL(input)
 
-	for n, tc := range testCases {
-		t.Logf("(%d) Testing %q", n, tc.Input)
-
-		err := URL(tc.Input)
-
-		if !errors.Is(err, tc.Err) {
-			t.Errorf("Expected error %v, got %v", tc.Err, err)
-		}
+			if !errors.Is(got, want) {
+				t.Error("got", got)
+				t.Error("want", want)
+			}
+		})
 	}
 }

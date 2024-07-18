@@ -2,32 +2,35 @@ package validate
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
 
+func ExampleUUID() {
+	fmt.Println(UUID("not a uuid"))
+	// Output: invalid UUID
+}
+
 func TestUUID(t *testing.T) {
-	type TestCase struct {
-		Input string
-		Err   error
+	testCases := map[string]error{
+		"00000000-0000-0000-0000-000000000000": nil,
+		"01234567-89ab-cdef-0123-456789abcdef": nil,
+		"abcdef01-2345-6789-abcd-ef0123456789": nil,
+
+		"not a uuid":                           ErrInvalidUUID,
+		"00000000-00-0000-0000-00000000000000": ErrInvalidUUID,
+		"00000000000000000000000000000000":     ErrInvalidUUID,
+		"01234567-89ab-cdef-ghij-klmnopqrstuv": ErrInvalidUUID,
 	}
 
-	testCases := []TestCase{
-		{Input: "00000000-0000-0000-0000-000000000000"},
-		{Input: "01234567-89ab-cdef-0123-456789abcdef"},
-		{Input: "abcdef01-2345-6789-abcd-ef0123456789"},
-		{Input: "Not a UUID", Err: ErrInvalidUUID},
-		{Input: "00000000-00-0000-0000-00000000000000", Err: ErrInvalidUUID},
-		{Input: "00000000000000000000000000000000", Err: ErrInvalidUUID},
-		{Input: "01234567-89ab-cdef-ghij-klmnopqrstuv", Err: ErrInvalidUUID},
-	}
+	for input, want := range testCases {
+		t.Run(input, func(t *testing.T) {
+			got := UUID(input)
 
-	for n, tc := range testCases {
-		t.Logf("(%d) Testing %q", n, tc.Input)
-
-		err := UUID(tc.Input)
-
-		if !errors.Is(err, tc.Err) {
-			t.Errorf("Expected error %v, got %v", tc.Err, err)
-		}
+			if !errors.Is(got, want) {
+				t.Error("got", got)
+				t.Error("want", want)
+			}
+		})
 	}
 }

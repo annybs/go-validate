@@ -2,59 +2,60 @@ package validate
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
 
+func ExampleChars() {
+	testChars := Chars("0123456789abcdef")
+	fmt.Println(testChars("invalid input"))
+	// Output: contains disallowed characters
+}
+
+func ExampleExceptChars() {
+	testExceptChars := Chars("0123456789abcdef")
+	fmt.Println(testExceptChars("invalid input"))
+	// Output: contains disallowed characters
+}
+
 func TestChars(t *testing.T) {
-	type TestCase struct {
-		Input string
-		C     string
-		Err   error
+	testCases := map[string]map[string]error{
+		"0123456789abcdef": {"abcd1234": nil, "abcd 1234": ErrDisallowedChars, "ghijklmno": ErrDisallowedChars},
 	}
 
-	hexRange := "0123456789abcdef"
+	for setup, values := range testCases {
+		testChars := Chars(setup)
 
-	testCases := []TestCase{
-		{Input: "abcd1234", C: hexRange},
-		{Input: "abcd 1234", C: hexRange, Err: ErrDisallowedChars},
-		{Input: "ghijklmno", C: hexRange, Err: ErrDisallowedChars},
-	}
+		for input, want := range values {
+			t.Run(input, func(t *testing.T) {
+				got := testChars(input)
 
-	for n, tc := range testCases {
-		t.Logf("(%d) Testing %q against %q", n, tc.Input, tc.C)
-
-		f := Chars(tc.C)
-		err := f(tc.Input)
-
-		if !errors.Is(err, tc.Err) {
-			t.Errorf("Expected error %v, got %v", tc.Err, err)
+				if !errors.Is(got, want) {
+					t.Error("got", got)
+					t.Error("want", want)
+				}
+			})
 		}
 	}
 }
 
 func TestExceptChars(t *testing.T) {
-	type TestCase struct {
-		Input string
-		C     string
-		Err   error
+	testCases := map[string]map[string]error{
+		"0123456789abcdef": {"abcd1234": ErrDisallowedChars, "abcd 1234": ErrDisallowedChars, "ghijklmno": nil},
 	}
 
-	hexRange := "0123456789abcdef"
+	for setup, values := range testCases {
+		testExceptChars := ExceptChars(setup)
 
-	testCases := []TestCase{
-		{Input: "abcd1234", C: hexRange, Err: ErrDisallowedChars},
-		{Input: "abcd 1234", C: hexRange, Err: ErrDisallowedChars},
-		{Input: "ghijklmno", C: hexRange},
-	}
+		for input, want := range values {
+			t.Run(input, func(t *testing.T) {
+				got := testExceptChars(input)
 
-	for n, tc := range testCases {
-		t.Logf("(%d) Testing %q against %q", n, tc.Input, tc.C)
-
-		f := ExceptChars(tc.C)
-		err := f(tc.Input)
-
-		if !errors.Is(err, tc.Err) {
-			t.Errorf("Expected error %v, got %v", tc.Err, err)
+				if !errors.Is(got, want) {
+					t.Error("got", got)
+					t.Error("want", want)
+				}
+			})
 		}
 	}
 }

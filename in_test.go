@@ -2,59 +2,37 @@ package validate
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
 
-func TestInInt(t *testing.T) {
-	type TestCase struct {
-		Input int
-		A     []int
-		Err   error
-	}
-
-	allow := []int{1, 23, 456}
-	testCases := []TestCase{
-		{Input: 1, A: allow},
-		{Input: 23, A: allow},
-		{Input: 456, A: allow},
-		{Input: 789, A: allow, Err: ErrValueNotAllowed},
-	}
-
-	for n, tc := range testCases {
-		t.Logf("(%d) Testing %d against %v", n, tc.Input, tc.A)
-
-		f := In(tc.A...)
-		err := f(tc.Input)
-
-		if !errors.Is(err, tc.Err) {
-			t.Errorf("Expected error %v, got %v", tc.Err, err)
-		}
-	}
+func ExampleIn() {
+	testIn := In("abc", "def", "xyz")
+	fmt.Println(testIn("123"))
+	// Output: not allowed
 }
 
-func TestInString(t *testing.T) {
-	type TestCase struct {
-		Input string
-		A     []string
-		Err   error
+func TestIn(t *testing.T) {
+	testIn := In("abc", "def", "xyz")
+
+	testCases := map[string]error{
+		"abc": nil,
+		"def": nil,
+		"xyz": nil,
+
+		"abcd": ErrValueNotAllowed,
+		"123":  ErrValueNotAllowed,
+		"":     ErrValueNotAllowed,
 	}
 
-	allow := []string{"abcd", "ef", "1234"}
-	testCases := []TestCase{
-		{Input: "abcd", A: allow},
-		{Input: "ef", A: allow},
-		{Input: "1234", A: allow},
-		{Input: "5678", A: allow, Err: ErrValueNotAllowed},
-	}
+	for input, want := range testCases {
+		t.Run(input, func(t *testing.T) {
+			got := testIn(input)
 
-	for n, tc := range testCases {
-		t.Logf("(%d) Testing %q against %v", n, tc.Input, tc.A)
-
-		f := In(tc.A...)
-		err := f(tc.Input)
-
-		if !errors.Is(err, tc.Err) {
-			t.Errorf("Expected error %v, got %v", tc.Err, err)
-		}
+			if !errors.Is(got, want) {
+				t.Error("got", got)
+				t.Error("want", want)
+			}
+		})
 	}
 }

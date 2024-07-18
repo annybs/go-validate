@@ -2,55 +2,29 @@ package validate
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
 
-func TestEqualInt(t *testing.T) {
-	type TestCase struct {
-		I   int
-		C   int
-		Err error
+func TestEqual(t *testing.T) {
+	testCases := map[string]map[string]error{
+		"abc": {"abc": nil, "def": ErrNotEqual.With("abc"), "xyz": ErrNotEqual.With("abc")},
+		"def": {"abc": ErrNotEqual.With("def"), "def": nil, "xyz": ErrNotEqual.With("def")},
+		"xyz": {"abc": ErrNotEqual.With("xyz"), "def": ErrNotEqual.With("xyz"), "xyz": nil},
 	}
 
-	testCases := []TestCase{
-		{I: 1, C: 1},
-		{I: 5 ^ 3, C: 5 ^ 3},
-		{I: 10, C: 15, Err: ErrNotEqual},
-	}
+	for setup, values := range testCases {
+		testEqual := Equal(setup)
 
-	for i, tc := range testCases {
-		t.Logf("(%d) Testing %d against %d", i, tc.I, tc.C)
+		for input, want := range values {
+			t.Run(fmt.Sprintf("%s/%s", setup, input), func(t *testing.T) {
+				got := testEqual(input)
 
-		f := Equal(tc.C)
-		err := f(tc.I)
-
-		if !errors.Is(err, tc.Err) {
-			t.Errorf("Expected error %v, got %v", tc.Err, err)
-		}
-	}
-}
-
-func TestEqualStr(t *testing.T) {
-	type TestCase struct {
-		I   string
-		C   string
-		Err error
-	}
-
-	testCases := []TestCase{
-		{I: "abc", C: "abc"},
-		{I: "def ghi 123", C: "def ghi 123"},
-		{I: "jkl", C: "mno", Err: ErrNotEqual},
-	}
-
-	for i, tc := range testCases {
-		t.Logf("(%d) Testing %s against %s", i, tc.I, tc.C)
-
-		f := Equal(tc.C)
-		err := f(tc.I)
-
-		if !errors.Is(err, tc.Err) {
-			t.Errorf("Expected error %v, got %v", tc.Err, err)
+				if !errors.Is(got, want) {
+					t.Error("got", got)
+					t.Error("want", want)
+				}
+			})
 		}
 	}
 }
