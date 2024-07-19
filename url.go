@@ -2,7 +2,6 @@ package validate
 
 import "net/url"
 
-// Validation error.
 var (
 	ErrInvalidURL Error = NewError("invalid URL")
 )

@@ -1,6 +1,5 @@
 package validate
 
-// Validation error.
 var (
 	ErrMustHaveMoreItems  = NewError("must have at least %d items")
 	ErrMustHaveFewerItems = NewError("must have no more than %d items")

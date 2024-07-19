@@ -4,7 +4,6 @@ import (
 	"strings"
 )
 
-// Validation error.
 var (
 	ErrDisallowedChars = NewError("contains disallowed characters")
 )

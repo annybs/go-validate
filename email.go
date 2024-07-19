@@ -4,7 +4,6 @@ import (
 	"regexp"
 )
 
-// Validation error.
 var (
 	ErrInvalidEmail = NewError("invalid email address")
 )

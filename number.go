@@ -1,6 +1,5 @@
 package validate
 
-// Validation error.
 var (
 	ErrMustBeGreater        = NewError("must be greater than %v")
 	ErrMustBeGreaterOrEqual = NewError("must be greater than or equal to %v")

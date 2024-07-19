@@ -4,7 +4,6 @@ import (
 	"regexp"
 )
 
-// Validation error.
 var (
 	ErrInvalidUUID = NewError("invalid UUID")
 )

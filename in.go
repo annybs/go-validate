@@ -1,6 +1,5 @@
 package validate
 
-// Validation error.
 var (
 	ErrValueNotAllowed = NewError("not allowed")
 )

@@ -1,6 +1,5 @@
 package validate
 
-// Validation error.
 var (
 	ErrMustBeLonger  = NewError("must contain at least %d characters")
 	ErrMustBeShorter = NewError("must contain no more than %d characters")
