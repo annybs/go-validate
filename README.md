@@ -4,4 +4,4 @@ A suite of straightforward validation functions. You put something in, you get b
 
 ## License
 
-See [LICENSE.md](../LICENSE.md)
+See [LICENSE.md](./LICENSE.md)
